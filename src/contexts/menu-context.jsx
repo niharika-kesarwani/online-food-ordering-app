@@ -7,6 +7,11 @@ export const MenuContext = createContext();
 
 export const MenuProvider = ({ children }) => {
   const [food, setFood] = useState([]);
+  const [filters, setFilters] = useState({
+    checkBox: [],
+    textInput: "",
+    sort: null,
+  });
 
   const getFood = async () => {
     try {
@@ -26,40 +31,52 @@ export const MenuProvider = ({ children }) => {
     getFood();
   }, []);
 
-  const inputHandler = (inputTarget) =>
-    food.filter(({ name }) =>
-      name.toLowerCase().includes(inputTarget.value.toLowerCase())
-    );
-
-  const checkBoxHandler = (inputTarget) => {
-    const isChecked = inputTarget.checked;
-    if (isChecked === false) {
-      return food;
-    }
-    switch (inputTarget.value) {
-      case "veg":
-        return food.filter(({ is_vegetarian }) => is_vegetarian);
-      case "spicy":
-        return food.filter(({ is_spicy }) => is_spicy);
-    }
+  const handleCheckboxInput = (type) => {
+    filters?.checkBox?.includes(type)
+      ? setFilters({
+          ...filters,
+          checkBox: filters?.checkBox?.filter(
+            (checkboxFilter) => checkboxFilter !== type
+          ),
+        })
+      : setFilters({ ...filters, checkBox: [...filters.checkBox, type] });
   };
 
-  const radioHandler = (inputTarget) => {
-    switch (inputTarget.value) {
-      case "lth":
-        return [...food.sort((food1, food2) => food1.price - food2.price)];
-      case "htl":
-        return [...food.sort((food1, food2) => food2.price - food1.price)];
-    }
-  };
+  const handleTextInput = (inputTarget) =>
+    setFilters({ ...filters, textInput: inputTarget.value });
+
+  const handleSortInput = (sortInput) =>
+    setFilters({ ...filters, sort: sortInput });
+
+  const checkboxFiltered =
+    filters?.checkBox?.length > 0
+      ? food.filter((item) =>
+          filters?.checkBox?.every((checkboxFilter) => item[checkboxFilter])
+        )
+      : food;
+
+  const textFiltered =
+    filters?.textInput?.length > 0
+      ? checkboxFiltered?.filter(({ name }) =>
+          name?.toLowerCase()?.includes(filters?.textInput?.toLowerCase())
+        )
+      : checkboxFiltered;
+
+  const sortFiltered = filters?.sort
+    ? textFiltered?.sort((item1, item2) =>
+        filters?.sort === "lth"
+          ? item1?.price - item2?.price
+          : item2?.price - item1?.price
+      )
+    : textFiltered;
 
   return (
     <MenuContext.Provider
       value={{
-        food,
-        inputHandler,
-        checkBoxHandler,
-        radioHandler,
+        handleCheckboxInput,
+        handleTextInput,
+        handleSortInput,
+        sortFiltered,
       }}
     >
       {children}

@@ -9,18 +9,16 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = (item) => {
     cart.includes(item) ? null : setCart((cart) => [...cart, item]);
-    console.log(cart);
   };
 
-  const isItemInCart = (item) =>
-    cart.find(({ id }) => id === item.id) ? true : false;
+  const isItemInCart = (item) => cart?.find(({ id }) => id === item.id);
 
-  const totalDeliveryTimeInCart = cart.reduce(
+  const totalDeliveryTimeInCart = cart?.reduce(
     (total, { delivery_time }) => total + delivery_time,
     0
   );
 
-  const totalPriceInCart = cart.reduce((total, { price }) => total + price, 0);
+  const totalPriceInCart = cart?.reduce((total, { price }) => total + price, 0);
 
   return (
     <CartContext.Provider

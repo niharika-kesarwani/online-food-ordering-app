@@ -1,11 +1,14 @@
 /* eslint-disable react/jsx-key */
-import { useState } from "react";
 import { useMenu } from "../main";
 import { FoodCard } from "../components/FoodCard";
 
 export const Menu = () => {
-  const { food, inputHandler, checkBoxHandler, radioHandler } = useMenu();
-  const [display, setDisplay] = useState(food);
+  const {
+    handleCheckboxInput,
+    handleTextInput,
+    handleSortInput,
+    sortFiltered,
+  } = useMenu();
 
   return (
     <>
@@ -13,13 +16,13 @@ export const Menu = () => {
       <input
         placeholder="Search food here"
         type="text"
-        onChange={(e) => setDisplay(inputHandler(e.target))}
+        onChange={(e) => handleTextInput(e.target)}
       />
       <label>
         <input
           type="checkbox"
           value="veg"
-          onChange={(e) => setDisplay(checkBoxHandler(e.target))}
+          onChange={() => handleCheckboxInput("is_vegetarian")}
         />
         Veg
       </label>
@@ -27,7 +30,7 @@ export const Menu = () => {
         <input
           type="checkbox"
           value="spicy"
-          onChange={(e) => setDisplay(checkBoxHandler(e.target))}
+          onChange={() => handleCheckboxInput("is_spicy")}
         />
         Spicy
       </label>
@@ -36,7 +39,7 @@ export const Menu = () => {
           type="radio"
           value="lth"
           name="radio"
-          onChange={(e) => setDisplay(radioHandler(e.target))}
+          onChange={() => handleSortInput("lth")}
         />
         Sort (price) Low to High{" "}
       </label>
@@ -45,13 +48,13 @@ export const Menu = () => {
           type="radio"
           value="htl"
           name="radio"
-          onChange={(e) => setDisplay(radioHandler(e.target))}
+          onChange={() => handleSortInput("htl")}
         />
         Sort (price) High to Low{" "}
       </label>
       <h2>Menu</h2>
       <ul>
-        {display.map((displayItem) => {
+        {sortFiltered?.map((displayItem) => {
           return <FoodCard displayItem={displayItem} />;
         })}
       </ul>
